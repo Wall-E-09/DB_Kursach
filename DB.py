@@ -63,8 +63,7 @@ cursor.execute('''
         customers_id INT,
         FOREIGN KEY (customers_id) REFERENCES customers(id),
 
-        carriers_id INT,
-        FOREIGN KEY (carriers_id) REFERENCES carriers(id),
+        
 
         total_price DECIMAL(10,2),
         total_amount INT,
@@ -75,6 +74,9 @@ cursor.execute('''
         date_of_arrival DATE,
 
         order_description TEXT
+        
+        carriers_id INT,
+        FOREIGN KEY (carriers_id) REFERENCES carriers(id),
     );
 ''')
 
@@ -82,11 +84,7 @@ cursor.execute('''
     CREATE TABLE IF NOT EXISTS supply (
         id INT AUTO_INCREMENT PRIMARY KEY,
         
-        components_id INT,
-        FOREIGN KEY (components_id) REFERENCES components(id),
-
-        supplier_id INT,
-        FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
+        
 
         total_price DECIMAL(10,2),
         total_amount INT,
@@ -97,6 +95,12 @@ cursor.execute('''
         date_of_arrival DATE,
 
         other_description TEXT
+               
+        components_id INT,
+        FOREIGN KEY (components_id) REFERENCES components(id),
+
+        supplier_id INT,
+        FOREIGN KEY (supplier_id) REFERENCES suppliers(id),       
     );
 ''')
 
@@ -177,14 +181,16 @@ cursor.execute('''
         number_of_employees INT NOT NULL,
         special_conditions TEXT,
 
+        
+
+        storage_license_type_id INT,
+        FOREIGN KEY (storage_license_type_id) REFERENCES license_type(id)
+               
         employees_id INT,
         FOREIGN KEY (employees_id) REFERENCES employees(id),
         
         storage_boss_id INT,
-        FOREIGN KEY (storage_boss_id) REFERENCES employees(id),
-
-        storage_license_type_id INT,
-        FOREIGN KEY (storage_license_type_id) REFERENCES license_type(id)
+        FOREIGN KEY (storage_boss_id) REFERENCES employees(id),       
     );
 ''')
 
