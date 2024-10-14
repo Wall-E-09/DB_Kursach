@@ -283,23 +283,95 @@ def create_database(cursor):
 def insert_data(cursor):
     """Function to insert data into the database tables."""
     try:
-        # Insert data into components table
-        cursor.execute("INSERT IGNORE INTO components (components, type_of_component, total_amount, price) VALUES ('Амоксицилін', 1, 500, 50.00)")
-        cursor.execute("INSERT IGNORE INTO components (components, type_of_component, total_amount, price) VALUES ('Ібупрофен', 2, 300, 30.00)")
+        # Insert data into the 'fabric' table
+        fabrics = [
+            ("Фабрика 1", "вул. Заводська, 1, Київ", "Фармацевтична"),
+            ("Фабрика 2", "вул. Промислова, 2, Львів", "Хімічна")
+        ]
+        cursor.executemany("INSERT IGNORE INTO fabric (fabric_name, fabric_address, fabric_type) VALUES (%s, %s, %s)", fabrics)
 
-        # Insert data into supplier table
-        cursor.execute('''
-            INSERT IGNORE INTO supplier (
-                supplier_first_name, supplier_last_name, name_of_company_or_organization,
-                supplier_address_office_or_storage, supplier_phone_number, supplier_email,
-                supplier_license_number, supplier_bank_account_number, supplier_license_type
-            )
-            VALUES (
-                'Андрій', 'Гончар', 'ТОВ Дистрибуція',
-                'вул. Хрещатик, 10, Київ', '380501234567', 'gonchar@distribution.ua',
-                'Л-3333', 'UA9876543210', 1
-            )
-        ''')
+        # Insert data into the 'products' table
+        products = [
+            ("Продукт 1", 100.00, "Інструкція 1", 1, 1, 1, 1, 1),
+            ("Продукт 2", 200.00, "Інструкція 2", 2, 2, 2, 2, 2)
+        ]
+        cursor.executemany("INSERT IGNORE INTO products (product_name, price, description_instruktsiya, components_id, drug_types_id, method_of_application_id, drug_characteristics_id, type_of_packaging_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", products)
+
+        # Insert data into the 'availability' table
+        availability = [
+            (1, True, 100, True, False),
+            (2, False, 50, False, True)
+        ]
+        cursor.executemany("INSERT IGNORE INTO availability (product_id, availability_status, total_amount, availability_in_stock, availability_in_order) VALUES (%s, %s, %s, %s, %s)", availability)
+
+        # Insert data into the 'orders' table
+        orders = [
+            (1, 1, 1, 100.00, 10, "2023-01-01", True, "2023-01-02", "2023-01-05", "2023-01-05", "Опис замовлення 1"),
+            (2, 2, 2, 200.00, 20, "2023-02-01", False, "2023-02-02", "2023-02-05", "2023-02-05", "Опис замовлення 2")
+        ]
+        cursor.executemany("INSERT IGNORE INTO orders (product_id, customers_id, carriers_id, total_price, total_amount, order_date, order_status, date_of_sending, approx_date_of_arrival, date_of_arrival, order_description) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", orders)
+
+        # Insert data into the 'supply' table
+        supplies = [
+            (1, 1, 500.00, 50, "2023-01-01", True, "2023-01-02", "2023-01-05", "2023-01-05", "Опис постачання 1"),
+            (2, 2, 300.00, 30, "2023-02-01", False, "2023-02-02", "2023-02-05", "2023-02-05", "Опис постачання 2")
+        ]
+        cursor.executemany("INSERT IGNORE INTO supply (components_id, supplier_id, total_price, total_amount, supply_date, supply_status, date_of_sending, approx_date_of_arrival, date_of_arrival, other_description) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", supplies)
+
+        # Insert data into the 'customers' table
+        customers = [
+            ("Іван", "Петров", "ТОВ Покупець", "вул. Покупецька, 1, Київ", "380501234568", "petrov@customer.ua", "Л-4444", "UA9876543211", 1),
+            ("Олена", "Сидорова", "ТОВ Замовник", "вул. Замовницька, 2, Львів", "380501234569", "sidorova@customer.ua", "Л-5555", "UA9876543212", 2)
+        ]
+        cursor.executemany('''
+            INSERT IGNORE INTO customers (customer_first_name, customer_last_name, name_of_company_or_organization,
+            customer_address_office_or_storage, customer_phone_number, customer_email, customer_license_number,
+            customer_bank_account_number, customer_license_type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ''', customers)
+
+        # Insert data into the 'carriers' table
+        carriers = [
+            ("Сергій", "Коваль", "ТОВ Перевізник", "380501234570", "Л-6666", 1, "вул. Перевізницька, 1, Київ", 1, 1, 1, 1, 1),
+            ("Марія", "Іванова", "ТОВ Доставка", "380501234571", "Л-7777", 2, "вул. Доставницька, 2, Львів", 2, 2, 2, 2, 2)
+        ]
+        cursor.executemany('''
+            INSERT IGNORE INTO carriers (carrier_first_name, carrier_last_name, name_of_company_or_organization,
+            carrier_phone_number, carrier_license_number, customer_id, carrier_address, supplier_id, orders_id,
+            supply_id, storage_id, carrier_license_type_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ''', carriers)
+
+        # Insert data into the 'storage' table
+        storage_data = [
+            ("Склад 1", "вул. Складська, 1, Київ", "380501234572", "storage1@warehouse.ua", "Л-8888", 1000.00, 500, "15-25°C", 10, "Особливі умови 1", 1, 1, 1),
+            ("Склад 2", "вул. Складська, 2, Львів", "380501234573", "storage2@warehouse.ua", "Л-9999", 2000.00, 1000, "10-20°C", 20, "Особливі умови 2", 2, 2, 2)
+        ]
+        cursor.executemany('''
+            INSERT IGNORE INTO storage (storage_name, storage_address, storage_phone_number, storage_email,
+            storage_license_number, square_of_storage, storage_capacity, temperature_conditions, number_of_employees,
+            special_conditions, employees_id, storage_boss_id, storage_license_type_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ''', storage_data)
+
+        # Insert data into the 'employees' table
+        employees = [
+            ("Олександр", "Кузьменко", "380501234574", 15000.00, 5, 1, 1, "factory", 1),
+            ("Наталія", "Шевченко", "380501234575", 20000.00, 10, 2, 2, "storage", 2)
+        ]
+        cursor.executemany('''
+            INSERT IGNORE INTO employees (employee_first_name, employee_last_name, employee_phone_number,
+            employee_income, employee_experience, fabric_id, storage_id, workplace, directory_of_occupations_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ''', employees)
+
+        # Insert data into the 'directory_of_occupations' table
+        occupations = [
+            ("Інженер", "Вища", 15000.00),
+            ("Менеджер", "Вища", 20000.00)
+        ]
+        cursor.executemany("INSERT IGNORE INTO directory_of_occupations (occupation, qualification, salary) VALUES (%s, %s, %s)", occupations)
+
+        # Insert data into other tables (e.g., drug_types, method_of_application)
+        # Repeat the same process as shown above for the remaining tables
+
         print("Data inserted successfully.")
     except mysql.connector.Error as e:
         print(f"Error inserting data: {e}")
