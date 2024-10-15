@@ -515,11 +515,6 @@ def user_input(cursor):
     else:
         print("Невірний вибір. Спробуйте ще раз.")
 
-    # Commit the changes to the database
-    conn.commit()
-
-
-
 
 def main():
     try:
@@ -539,6 +534,9 @@ def main():
 
         # Insert data into tables
         insert_data(cursor)
+
+        # User input
+        user_input(cursor)
 
         # Commit changes
         conn.commit()
