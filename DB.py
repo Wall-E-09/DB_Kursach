@@ -208,312 +208,416 @@ def insert_data(cursor):
 
         
 def user_input(cursor):
-    print("1. Додати новий продукт")
-    print("2. Додати нове замовлення")  
-    print("3. Додати нового постачальника")
-    print("4. Додати нового клієнта")
-    print("5. Додати нового перевізника")
-    print("6. Додати новий склад")
-    print("7. Додати нового працівника")
-    print("8. Додати нову посаду")
-    print("9. Додати новий компонент")
-    print("10. Додати новий тип ліків")
-    print("11. Додати новий тип компоненту")
-    print("12. Додати новий метод застосування")
-    print("13. Додати нову характеристику ліків")
-    print("14. Додати новий тип упаковки")
-    print("15. Додати новий етап відправлення")
-    print("16. Додати новий тип ліцензії")
-    print("17. Вийти")
-    choice = int(input("Виберіть опцію: "))
-    if choice == 1:
-    # Adding a product
-        product_name = input("Введіть назву продукту: ")
-        price = float(input("Введіть ціну продукту: "))
-        description_instruktsiya = input("Введіть інструкцію: ")
-        components_id = int(input("Введіть ID компоненту: "))
-        drug_types_id = int(input("Введіть ID типу ліків: "))
-        method_of_application_id = int(input("Введіть ID методу застосування: "))
-        drug_characteristics_id = int(input("Введіть ID характеристики ліків: "))
-        type_of_packaging_id = int(input("Введіть ID типу упаковки: "))
-        
-        cursor.execute('''
-            INSERT INTO products (
-                product_name, price, description_instruktsiya, components_id, 
-                drug_types_id, method_of_application_id, drug_characteristics_id, type_of_packaging_id
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        ''', (
-            product_name, price, description_instruktsiya, components_id, 
-            drug_types_id, method_of_application_id, drug_characteristics_id, type_of_packaging_id
-        ))
-        print("Продукт додано успішно.")
+    while True:
+        print("1. Додати новий продукт")
+        print("2. Додати нове замовлення")  
+        print("3. Додати нового постачальника")
+        print("4. Додати нового клієнта")
+        print("5. Додати нового перевізника")
+        print("6. Додати новий склад")
+        print("7. Додати нового працівника")
+        print("8. Додати нову посаду")
+        print("9. Додати новий компонент")
+        print("10. Додати новий тип ліків")
+        print("11. Додати новий тип компоненту")
+        print("12. Додати новий метод застосування")
+        print("13. Додати нову характеристику ліків")
+        print("14. Додати новий тип упаковки")
+        print("15. Додати новий етап відправлення")
+        print("16. Додати новий тип ліцензії")
+        print("17. Вийти")
 
-    elif choice == 2:
-        # Adding an order
-        product_id = int(input("Введіть ID продукту: "))
-        customers_id = int(input("Введіть ID клієнта: "))
-        carriers_id = int(input("Введіть ID перевізника: "))
-        total_price = float(input("Введіть загальну ціну: "))
-        total_amount = int(input("Введіть загальну кількість: "))
-        order_date = input("Введіть дату замовлення: ")
-        order_status = bool(input("Введіть статус замовлення (0 або 1): "))
-        date_of_sending = input("Введіть дату відправлення: ")
-        approx_date_of_arrival = input("Введіть приблизну дату прибуття: ")
-        date_of_arrival = input("Введіть дату прибуття: ")
-        order_description = input("Введіть опис замовлення: ")
+        choice = int(input("Виберіть опцію: "))
 
-        cursor.execute('''
-            INSERT INTO orders (
+        if choice == 1:
+            # Adding a product
+            product_name = input("Введіть назву продукту: ")
+            price = float(input("Введіть ціну продукту: "))
+            description_instruktsiya = input("Введіть інструкцію: ")
+            components_id = int(input("Введіть ID компоненту: "))
+            drug_types_id = int(input("Введіть ID типу ліків: "))
+            method_of_application_id = int(input("Введіть ID методу застосування: "))
+            drug_characteristics_id = int(input("Введіть ID характеристики ліків: "))
+
+            # Get the type_of_packaging_id by name
+            packaging_type_name = input("Введіть тип упаковки (Тюбик, Пакет, Коробка, ...): ")
+            cursor.execute("SELECT id FROM type_of_packaging WHERE type_of_packaging = %s", (packaging_type_name,))
+            packaging_result = cursor.fetchone()
+
+            if packaging_result:
+                type_of_packaging_id = packaging_result[0]
+                cursor.execute('''
+                    INSERT INTO products (
+                        product_name, price, description_instruktsiya, components_id, 
+                        drug_types_id, method_of_application_id, drug_characteristics_id, type_of_packaging_id
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                ''', (
+                    product_name, price, description_instruktsiya, components_id, 
+                    drug_types_id, method_of_application_id, drug_characteristics_id, type_of_packaging_id
+                ))
+                print("Продукт додано успішно.")
+            else:
+                print("Помилка: Тип упаковки не знайдено.")
+
+
+        elif choice == 2:
+            # Adding an order
+            product_id = int(input("Введіть ID продукту: "))
+            customers_id = int(input("Введіть ID клієнта: "))
+            carriers_id = int(input("Введіть ID перевізника: "))
+            total_price = float(input("Введіть загальну ціну: "))
+            total_amount = int(input("Введіть загальну кількість: "))
+            order_date = input("Введіть дату замовлення (YYYY-MM-DD): ")
+            order_status = bool(input("Введіть статус замовлення (0 або 1): "))
+            date_of_sending = input("Введіть дату відправлення (YYYY-MM-DD): ")
+            approx_date_of_arrival = input("Введіть приблизну дату прибуття (YYYY-MM-DD): ")
+            date_of_arrival = input("Введіть дату прибуття (YYYY-MM-DD): ")
+            order_description = input("Введіть опис замовлення: ")
+
+            cursor.execute('''INSERT INTO orders (
                 product_id, customers_id, carriers_id, total_price, 
                 total_amount, order_date, order_status, date_of_sending, 
                 approx_date_of_arrival, date_of_arrival, order_description
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ''', (
-            product_id, customers_id, carriers_id, total_price, 
-            total_amount, order_date, order_status, date_of_sending, 
-            approx_date_of_arrival, date_of_arrival, order_description
-        ))
-        print("Замовлення додано успішно.")
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''', (
+                product_id, customers_id, carriers_id, total_price, 
+                total_amount, order_date, order_status, date_of_sending, 
+                approx_date_of_arrival, date_of_arrival, order_description
+            ))
+            print("Замовлення додано успішно.")
 
-    elif choice == 3:
-        # Adding a supplier
-        supplier_first_name = input("Введіть ім'я постачальника: ")
-        supplier_last_name = input("Введіть прізвище постачальника: ")
-        name_of_company_or_organization = input("Введіть назву компанії або організації: ")
-        supplier_address_office_or_storage = input("Введіть адресу офісу або складу постачальника: ")
-        supplier_phone_number = input("Введіть номер телефону постачальника: ")
-        supplier_email = input("Введіть електронну пошту постачальника: ")
-        supplier_license_number = input("Введіть номер ліцензії постачальника: ")
-        supplier_bank_account_number = input("Введіть номер банківського рахунку постачальника: ")
-        supplier_license_type = int(input("Введіть ID типу ліцензії постачальника: "))
+        elif choice == 3:
+            # Adding a supplier
+            supplier_first_name = input("Введіть ім'я постачальника: ")
+            supplier_last_name = input("Введіть прізвище постачальника: ")
+            name_of_company_or_organization = input("Введіть назву компанії або організації: ")
+            supplier_address_office_or_storage = input("Введіть адресу офісу або складу постачальника: ")
+            supplier_phone_number = input("Введіть номер телефону постачальника: ")
+            supplier_email = input("Введіть електронну пошту постачальника: ")
+            supplier_license_number = input("Введіть номер ліцензії постачальника: ")
+            supplier_bank_account_number = input("Введіть номер банківського рахунку постачальника: ")
+            supplier_license_type = input("Введіть тип ліцензії постачальника: ")
 
-        cursor.execute('''
-            INSERT INTO supplier (
+            cursor.execute('''SELECT * FROM supplier WHERE supplier_email = %s''', (supplier_email,))
+            if cursor.fetchone():
+                print("Постачальник з такою електронною поштою вже існує.")
+                continue
+
+            cursor.execute('''INSERT INTO supplier (
                 supplier_first_name, supplier_last_name, name_of_company_or_organization, 
                 supplier_address_office_or_storage, supplier_phone_number, supplier_email, 
                 supplier_license_number, supplier_bank_account_number, supplier_license_type
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ''', (
-            supplier_first_name, supplier_last_name, name_of_company_or_organization, 
-            supplier_address_office_or_storage, supplier_phone_number, supplier_email, 
-            supplier_license_number, supplier_bank_account_number, supplier_license_type
-        ))
-        print("Постачальника додано успішно.")
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)''', (
+                supplier_first_name, supplier_last_name, name_of_company_or_organization, 
+                supplier_address_office_or_storage, supplier_phone_number, supplier_email, 
+                supplier_license_number, supplier_bank_account_number, supplier_license_type
+            ))
+            print("Постачальника додано успішно.")
 
-    elif choice == 4:
-        # Adding a customer
-        customer_first_name = input("Введіть ім'я клієнта: ")
-        customer_last_name = input("Введіть прізвище клієнта: ")
-        name_of_company_or_organization = input("Введіть назву компанії або організації клієнта: ")
-        customer_address_office_or_storage = input("Введіть адресу офісу або складу клієнта: ")
-        customer_phone_number = input("Введіть номер телефону клієнта: ")
-        customer_email = input("Введіть електронну пошту клієнта: ")
-        customer_license_number = input("Введіть номер ліцензії клієнта: ")
-        customer_bank_account_number = input("Введіть номер банківського рахунку клієнта: ")
-        customer_license_type = int(input("Введіть ID типу ліцензії клієнта: "))
+        elif choice == 4:
+            # Adding a customer
+            customer_first_name = input("Введіть ім'я клієнта: ")
+            customer_last_name = input("Введіть прізвище клієнта: ")
+            name_of_company_or_organization = input("Введіть назву компанії або організації клієнта: ")
+            customer_address_office_or_storage = input("Введіть адресу офісу або складу клієнта: ")
+            customer_phone_number = input("Введіть номер телефону клієнта: ")
+            customer_email = input("Введіть електронну пошту клієнта: ")
+            customer_license_number = input("Введіть номер ліцензії клієнта: ")
+            customer_bank_account_number = input("Введіть номер банківського рахунку клієнта: ")
+            customer_license_type = input("Введіть тип ліцензії клієнта: ")
 
-        cursor.execute('''
-            INSERT INTO customers (
+            cursor.execute('''SELECT * FROM customers WHERE customer_email = %s''', (customer_email,))
+            if cursor.fetchone():
+                print("Клієнт з такою електронною поштою вже існує.")
+                continue
+
+            cursor.execute('''INSERT INTO customers (
                 customer_first_name, customer_last_name, name_of_company_or_organization, 
                 customer_address_office_or_storage, customer_phone_number, customer_email, 
                 customer_license_number, customer_bank_account_number, customer_license_type
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ''', (
-            customer_first_name, customer_last_name, name_of_company_or_organization, 
-            customer_address_office_or_storage, customer_phone_number, customer_email, 
-            customer_license_number, customer_bank_account_number, customer_license_type
-        ))
-        print("Клієнта додано успішно.")
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)''', (
+                customer_first_name, customer_last_name, name_of_company_or_organization, 
+                customer_address_office_or_storage, customer_phone_number, customer_email, 
+                customer_license_number, customer_bank_account_number, customer_license_type
+            ))
+            print("Клієнта додано успішно.")
+        elif choice == 5:
+        # Adding a new carrier
+            carrier_first_name = input("Введіть ім'я перевізника: ")
+            carrier_last_name = input("Введіть прізвище перевізника: ")
+            name_of_company_or_organization = input("Введіть назву компанії або організації перевізника: ")
+            carrier_phone_number = input("Введіть номер телефону перевізника: ")
+            carrier_license_number = input("Введіть номер ліцензії перевізника: ")
+            customer_id = int(input("Введіть ID клієнта: "))
+            carrier_address = input("Введіть адресу перевізника: ")
+            supplier_id = int(input("Введіть ID постачальника: "))
+            orders_id = int(input("Введіть ID замовлення: "))
+            supply_id = int(input("Введіть ID постачання: "))
+            storage_id = int(input("Введіть ID складу: "))
+            carrier_license_type = input("Введіть тип ліцензії перевізника: ")
 
-    elif choice == 5:
-        carrier_first_name = input("Введіть ім'я перевізника: ")
-        carrier_last_name = input("Введіть прізвище перевізника: ")
-        name_of_company_or_organization = input("Введіть назву компанії або організації перевізника: ")
-        carrier_phone_number = input("Введіть номер телефону перевізника: ")
-        carrier_license_number = input("Введіть номер ліцензії перевізника: ")
-        customer_id = int(input("Введіть ID клієнта: "))
-        carrier_address = input("Введіть адресу перевізника: ")
-        supplier_id = int(input("Введіть ID постачальника: "))
-        orders_id = int(input("Введіть ID замовлення: "))
-        supply_id = int(input("Введіть ID постачання: "))
-        storage_id = int(input("Введіть ID складу: "))
-        carrier_license_type_id = int(input("Введіть ID типу ліцензії перевізника: "))
-        
-        cursor.execute('''
-            INSERT INTO carriers (
+            # Check if the carrier already exists by checking the unique license number
+            cursor.execute('''SELECT * FROM carriers WHERE carrier_license_number = %s''', (carrier_license_number,))
+            if cursor.fetchone():
+                print("Перевізник з таким номером ліцензії вже існує.")
+                return
+
+            # Insert the new carrier
+            cursor.execute('''
+                INSERT INTO carriers (
+                    carrier_first_name, carrier_last_name, name_of_company_or_organization, 
+                    carrier_phone_number, carrier_license_number, customer_id, carrier_address, 
+                    supplier_id, orders_id, supply_id, storage_id, carrier_license_type
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ''', (
                 carrier_first_name, carrier_last_name, name_of_company_or_organization, 
                 carrier_phone_number, carrier_license_number, customer_id, carrier_address, 
-                supplier_id, orders_id, supply_id, storage_id, carrier_license_type_id
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ''', (
-            carrier_first_name, carrier_last_name, name_of_company_or_organization, 
-            carrier_phone_number, carrier_license_number, customer_id, carrier_address, 
-            supplier_id, orders_id, supply_id, storage_id, carrier_license_type_id
-        ))
-        
-        print("Перевізника додано успішно.")
+                supplier_id, orders_id, supply_id, storage_id, carrier_license_type
+            ))
 
-    elif choice == 6:
-        storage_name = input("Введіть назву складу: ")
-        storage_address = input("Введіть адресу складу: ")
-        storage_phone_number = input("Введіть номер телефону складу: ")
-        storage_email = input("Введіть електронну пошту складу: ")
-        storage_license_number = input("Введіть номер ліцензії складу: ")
-        square_of_storage = float(input("Введіть площу складу: "))
-        storage_capacity = int(input("Введіть місткість складу: "))
-        temperature_conditions = input("Введіть температурні умови: ")
-        number_of_employees = int(input("Введіть кількість працівників: "))
-        special_conditions = input("Введіть особливі умови: ")
-        employees_id = int(input("Введіть ID працівника: "))
-        storage_boss_id = int(input("Введіть ID начальника складу: "))
-        storage_license_type_id = int(input("Введіть ID типу ліцензії складу: "))
-        
-        cursor.execute('''
-            INSERT INTO storage (
-                storage_name, storage_address, storage_phone_number, storage_email, 
+            print("Перевізника додано успішно.")
+        elif choice == 6:
+            # Adding a new storage
+            storage_name = input("Введіть назву складу: ")
+            storage_address = input("Введіть адресу складу: ")
+            storage_phone_number = input("Введіть номер телефону складу: ")
+            storage_email = input("Введіть електронну пошту складу: ")
+            storage_license_number = input("Введіть номер ліцензії складу: ")
+            square_of_storage = float(input("Введіть площу складу: "))
+            storage_capacity = int(input("Введіть місткість складу: "))
+            temperature_conditions = input("Введіть температурні умови: ")
+            number_of_employees = int(input("Введіть кількість працівників: "))
+            special_conditions = input("Введіть особливі умови: ")
+            employees_id = int(input("Введіть ID працівника: "))
+            storage_boss_id = int(input("Введіть ID начальника складу: "))
+            storage_license_type = input("Введіть тип ліцензії складу: ")
+
+            # Check if the storage already exists by checking the unique license number
+            cursor.execute('''SELECT * FROM storage WHERE storage_license_number = %s''', (storage_license_number,))
+            if cursor.fetchone():
+                print("Склад з таким номером ліцензії вже існує.")
+                return
+
+            # Insert the new storage
+            cursor.execute('''
+                INSERT INTO storage (
+                    storage_name, storage_address, storage_phone_number, storage_email, 
+                    storage_license_number, square_of_storage, storage_capacity, 
+                    temperature_conditions, number_of_employees, special_conditions, 
+                    employees_id, storage_boss_id, storage_license_type
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ''', (storage_name, storage_address, storage_phone_number, storage_email, 
                 storage_license_number, square_of_storage, storage_capacity, 
                 temperature_conditions, number_of_employees, special_conditions, 
-                employees_id, storage_boss_id, storage_license_type_id
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ''', (storage_name, storage_address, storage_phone_number, storage_email, 
-            storage_license_number, square_of_storage, storage_capacity, 
-            temperature_conditions, number_of_employees, special_conditions, 
-            employees_id, storage_boss_id, storage_license_type_id))
-        
-        print("Склад додано успішно.")
+                employees_id, storage_boss_id, storage_license_type))
 
-    elif choice == 7:
-        employee_first_name = input("Введіть ім'я працівника: ")
-        employee_last_name = input("Введіть прізвище працівника: ")
-        employee_phone_number = input("Введіть номер телефону працівника: ")
-        employee_income = float(input("Введіть дохід працівника: "))
-        employee_experience = int(input("Введіть досвід працівника: "))
-        fabric_id = int(input("Введіть ID фабрики: "))
-        storage_id = int(input("Введіть ID складу: "))
-        workplace = input("Введіть місце роботи (factory/storage): ")
-        directory_of_occupations_id = int(input("Введіть ID посади: "))
-        
-        cursor.execute('''
-            INSERT INTO employees (
-                employee_first_name, employee_last_name, employee_phone_number, 
+            print("Склад додано успішно.")
+
+        elif choice == 7:
+        # Adding a new employee
+            employee_first_name = input("Введіть ім'я працівника: ")
+            employee_last_name = input("Введіть прізвище працівника: ")
+            employee_phone_number = input("Введіть номер телефону працівника: ")
+            employee_income = float(input("Введіть дохід працівника: "))
+            employee_experience = int(input("Введіть досвід працівника: "))
+            fabric_id = int(input("Введіть ID фабрики: "))
+            storage_id = int(input("Введіть ID складу: "))
+            workplace = input("Введіть місце роботи (factory/storage): ")
+            directory_of_occupations_id = int(input("Введіть ID посади: "))
+
+            # Check for duplicate phone number
+            cursor.execute('''SELECT * FROM employees WHERE employee_phone_number = %s''', (employee_phone_number,))
+            if cursor.fetchone():
+                print("Працівник з таким номером телефону вже існує.")
+                return
+
+            # Insert the new employee
+            cursor.execute('''
+                INSERT INTO employees (
+                    employee_first_name, employee_last_name, employee_phone_number, 
+                    employee_income, employee_experience, fabric_id, storage_id, 
+                    workplace, directory_of_occupations_id
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ''', (employee_first_name, employee_last_name, employee_phone_number, 
                 employee_income, employee_experience, fabric_id, storage_id, 
-                workplace, directory_of_occupations_id
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ''', (employee_first_name, employee_last_name, employee_phone_number, 
-            employee_income, employee_experience, fabric_id, storage_id, 
-            workplace, directory_of_occupations_id))
-        
-        print("Працівника додано успішно.")
+                workplace, directory_of_occupations_id))
+            
+            print("Працівника додано успішно.")
 
-    elif choice == 8:
-        occupation = input("Введіть назву посади: ")
-        qualification = input("Введіть кваліфікацію: ")
-        salary = float(input("Введіть зарплату: "))
-        
-        cursor.execute('''
-            INSERT INTO directory_of_occupations (occupation, qualification, salary)
-            VALUES (%s, %s, %s)
-        ''', (occupation, qualification, salary))
-        
-        print("Посаду додано успішно.")
+        elif choice == 8:
+            # Adding a new occupation
+            occupation = input("Введіть назву посади: ")
+            qualification = input("Введіть кваліфікацію: ")
+            salary = float(input("Введіть зарплату: "))
 
-    elif choice == 9:
-        components = input("Введіть назву компоненту: ")
-        type_of_component = int(input("Введіть ID типу компоненту: "))
-        total_amount = int(input("Введіть загальну кількість: "))
-        price = float(input("Введіть ціну: "))
-        
-        cursor.execute('''
-            INSERT INTO components (components, type_of_component, total_amount, price)
-            VALUES (%s, %s, %s, %s)
-        ''', (components, type_of_component, total_amount, price))
-        
-        print("Компонент додано успішно.")
+            # Check if the occupation already exists
+            cursor.execute('''SELECT * FROM directory_of_occupations WHERE occupation = %s''', (occupation,))
+            if cursor.fetchone():
+                print("Така посада вже існує.")
+                return
 
-    elif choice == 10:
-        type_name = input("Введіть назву типу ліків: ")
-        
-        cursor.execute('''
-            INSERT INTO drug_types (type_name)
-            VALUES (%s)
-        ''', (type_name,))
-        
-        print("Тип ліків додано успішно.")
+            # Insert the new occupation
+            cursor.execute('''
+                INSERT INTO directory_of_occupations (occupation, qualification, salary)
+                VALUES (%s, %s, %s)
+            ''', (occupation, qualification, salary))
+            
+            print("Посаду додано успішно.")
 
-    elif choice == 11:
-        component_type = input("Введіть тип компоненту: ")
-        
-        cursor.execute('''
-            INSERT INTO type_of_component (component_type)
-            VALUES (%s)
-        ''', (component_type,))
-        
-        print("Тип компоненту додано успішно.")
+        elif choice == 9:
+            # Adding a new component
+            components = input("Введіть назву компоненту: ")
+            type_of_component = input("Введіть тип компоненту (наприклад, Активний/Допоміжний): ")
+            total_amount = int(input("Введіть загальну кількість: "))
+            price = float(input("Введіть ціну: "))
 
-    elif choice == 12:
-        method = input("Введіть метод застосування: ")
-        
-        cursor.execute('''
-            INSERT INTO method_of_application (method)
-            VALUES (%s)
-        ''', (method,))
-        
-        print("Метод застосування додано успішно.")
+            # Check for duplicate component name
+            cursor.execute('''SELECT * FROM components WHERE components = %s''', (components,))
+            if cursor.fetchone():
+                print("Компонент з такою назвою вже існує.")
+                return
 
-    elif choice == 13:
-        characteristics = input("Введіть характеристику ліків: ")
-        
-        cursor.execute('''
-            INSERT INTO drug_characteristics (characteristics)
-            VALUES (%s)
-        ''', (characteristics,))
-        
-        print("Характеристику ліків додано успішно.")
+            # Insert the new component
+            cursor.execute('''
+                INSERT INTO components (components, type_of_component, total_amount, price)
+                VALUES (%s, %s, %s, %s)
+            ''', (components, type_of_component, total_amount, price))
+            
+            print("Компонент додано успішно.")
 
-    elif choice == 14:
-        type_of_packaging = input("Введіть тип упаковки: ")
-        number_in_pack = int(input("Введіть кількість в упаковці: "))
-        
-        cursor.execute('''
-            INSERT INTO type_of_packaging (type_of_packaging, number_in_pack)
-            VALUES (%s, %s)
-        ''', (type_of_packaging, number_in_pack))
-        
-        print("Тип упаковки додано успішно.")
+        elif choice == 10:
+            # Adding a new drug type
+            type_name = input("Введіть назву типу ліків: ")
 
-    elif choice == 15:
-        stage_of_sending = input("Введіть етап відправлення: ")
-        
-        cursor.execute('''
-            INSERT INTO stage_of_sending (stage_of_sending)
-            VALUES (%s)
-        ''', (stage_of_sending,))
-        
-        print("Етап відправлення додано успішно.")
+            # Check if the drug type already exists
+            cursor.execute('''SELECT * FROM drug_types WHERE type_name = %s''', (type_name,))
+            if cursor.fetchone():
+                print("Тип ліків з такою назвою вже існує.")
+                return
 
-    elif choice == 16:
-        license_type = input("Введіть тип ліцензії: ")
-        
-        cursor.execute('''
-            INSERT INTO license_type (license_type)
-            VALUES (%s)
-        ''', (license_type,))
-        
-        print("Тип ліцензії додано успішно.")
+            # Insert the new drug type
+            cursor.execute('''
+                INSERT INTO drug_types (type_name)
+                VALUES (%s)
+            ''', (type_name,))
+            
+            print("Тип ліків додано успішно.")
 
-    elif choice == 17:
-        print("Вихід з програми.")
-        return
+        elif choice == 11:
+            # Adding a new component type
+            component_type = input("Введіть тип компоненту: ")
 
-    else:
-        print("Невірний вибір. Спробуйте ще раз.")
+            # Check if the component type already exists
+            cursor.execute('''SELECT * FROM type_of_component WHERE component_type = %s''', (component_type,))
+            if cursor.fetchone():
+                print("Тип компоненту з такою назвою вже існує.")
+                return
+
+            # Insert the new component type
+            cursor.execute('''
+                INSERT INTO type_of_component (component_type)
+                VALUES (%s)
+            ''', (component_type,))
+            
+            print("Тип компоненту додано успішно.")
+
+        elif choice == 12:
+            # Adding a new method of application
+            method = input("Введіть метод застосування: ")
+
+            # Check if the method already exists
+            cursor.execute('''SELECT * FROM method_of_application WHERE method = %s''', (method,))
+            if cursor.fetchone():
+                print("Метод застосування з такою назвою вже існує.")
+                return
+
+            # Insert the new method
+            cursor.execute('''
+                INSERT INTO method_of_application (method)
+                VALUES (%s)
+            ''', (method,))
+            
+            print("Метод застосування додано успішно.")
+
+        elif choice == 13:
+            # Adding a new drug characteristic
+            characteristics = input("Введіть характеристику ліків: ")
+
+            # Check if the characteristic already exists
+            cursor.execute('''SELECT * FROM drug_characteristics WHERE characteristics = %s''', (characteristics,))
+            if cursor.fetchone():
+                print("Характеристика ліків з такою назвою вже існує.")
+                return
+
+            # Insert the new characteristic
+            cursor.execute('''
+                INSERT INTO drug_characteristics (characteristics)
+                VALUES (%s)
+            ''', (characteristics,))
+            
+            print("Характеристику ліків додано успішно.")
+
+        elif choice == 14:
+            # Adding a new packaging type
+            type_of_packaging = input("Введіть тип упаковки: ")
+            number_in_pack = int(input("Введіть кількість в упаковці: "))
+
+            # Check if the packaging type already exists
+            cursor.execute('''SELECT * FROM type_of_packaging WHERE type_of_packaging = %s''', (type_of_packaging,))
+            if cursor.fetchone():
+                print("Тип упаковки з такою назвою вже існує.")
+                return
+
+            # Insert the new packaging type
+            cursor.execute('''
+                INSERT INTO type_of_packaging (type_of_packaging, number_in_pack)
+                VALUES (%s, %s)
+            ''', (type_of_packaging, number_in_pack))
+            
+            print("Тип упаковки додано успішно.")
+
+        elif choice == 15:
+            # Adding a new stage of sending
+            stage_of_sending = input("Введіть етап відправлення: ")
+
+            # Check if the stage already exists
+            cursor.execute('''SELECT * FROM stage_of_sending WHERE stage_of_sending = %s''', (stage_of_sending,))
+            if cursor.fetchone():
+                print("Етап відправлення з такою назвою вже існує.")
+                return
+
+            # Insert the new stage
+            cursor.execute('''
+                INSERT INTO stage_of_sending (stage_of_sending)
+                VALUES (%s)
+            ''', (stage_of_sending,))
+            
+            print("Етап відправлення додано успішно.")
+
+        elif choice == 16:
+            # Adding a new license type
+            license_type = input("Введіть тип ліцензії: ")
+
+            # Check if the license type already exists
+            cursor.execute('''SELECT * FROM license_type WHERE license_type = %s''', (license_type,))
+            if cursor.fetchone():
+                print("Тип ліцензії з такою назвою вже існує.")
+                return
+
+            # Insert the new license type
+            cursor.execute('''
+                INSERT INTO license_type (license_type)
+                VALUES (%s)
+            ''', (license_type,))
+            
+            print("Тип ліцензії додано успішно.")
+
+        elif choice == 17:
+            print("Вихід з програми.")
+            return
+
+        else:
+            print("Невірний вибір. Спробуйте ще раз.")
 
 
 def main():
